@@ -8,6 +8,8 @@ using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
+using namespace aie;
+using namespace glm;
 
 Application3D::Application3D() {
 
@@ -25,10 +27,28 @@ bool Application3D::startup() {
 	Gizmos::create(10000, 10000, 10000, 10000);
 
 	// create simple camera transforms
-	m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f,
-										  getWindowWidth() / (float)getWindowHeight(),
-										  0.1f, 1000.f);
+	m_viewMatrix = lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
+	m_projectionMatrix = perspective(pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
+
+	m_shader.loadShader(eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_shader.loadShader(eShaderStage::FRAGMENT, "./shaders/simple.frag");
+
+	if (m_shader.link() == false) 
+	{
+		printf("Shader Error: %s\n", m_shader.getLastError());
+		return false;
+	}
+
+	m_quadMesh.initialiseQuad();
+
+	// make the quad 10 units wide
+	m_quadTransform = 
+	{
+	10,0,0,0,
+	0,10,0,0,
+	0,0,10,0,
+	0,0,0,1 
+	};
 
 	return true;
 }
@@ -54,12 +74,8 @@ void Application3D::update(float deltaTime) {
 	vec4 white(1);
 	vec4 black(0, 0, 0, 1);
 	for (int i = 0; i < 21; ++i) {
-		Gizmos::addLine(vec3(-10 + i, 0, 10),
-						vec3(-10 + i, 0, -10),
-						i == 10 ? white : black);
-		Gizmos::addLine(vec3(10, 0, -10 + i),
-						vec3(-10, 0, -10 + i),
-						i == 10 ? white : black);
+		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
+		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
 	}
 
 	// add a transform so that we can see the axis
@@ -78,9 +94,17 @@ void Application3D::draw() {
 	clearScreen();
 
 	// update perspective in case window resized
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f,
-										  getWindowWidth() / (float)getWindowHeight(),
-										  0.1f, 1000.f);
+	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
+
+	// bind shader
+	m_shader.bind();
+
+	// bind transform
+	auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	m_shader.bindUniform("ProjectionViewModel", pvm);
+
+	// draw quad
+	m_quadMesh.draw();
 
 	// draw 3D gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);

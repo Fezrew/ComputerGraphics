@@ -3,6 +3,7 @@
 #include "Input.h"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <imgui.h>
 
 using glm::vec3;
 using glm::vec4;
@@ -55,7 +56,7 @@ bool Application3D::startup() {
 		0,0,0,1
 	};
 
-	m_light.colour = { 1, 1, 0 };
+	m_light.colour = { 1, 0, 0 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	return true;
@@ -75,7 +76,12 @@ void Application3D::update(float deltaTime) {
 	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 10, 10, glm::cos(time) * 10), vec3(0), vec3(0, 1, 0));
 
 	// rotate light
-	m_light.direction = normalize(vec3(cos(time * 2), sin(time * 2), 0));
+	//m_light.direction = normalize(vec3(cos(time * 2), sin(time * 2), 0));
+
+	ImGui::Begin("Light Settings");
+	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f, 1.0f);
+	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::End();
 
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();

@@ -1,9 +1,11 @@
 #pragma once
-
 #include "Application.h"
 #include <glm/mat4x4.hpp>
 #include "Mesh.h"
 #include "Shader.h"
+#include "OBJMesh.h"
+
+using namespace aie;
 
 class Application3D : public aie::Application {
 public:
@@ -19,10 +21,20 @@ public:
 
 protected:
 
-	glm::mat4	m_viewMatrix;
-	glm::mat4	m_projectionMatrix;
+	mat4	m_viewMatrix;
+	mat4	m_projectionMatrix;
 
-	aie::ShaderProgram m_shader;
-	Mesh m_quadMesh;
-	glm::mat4 m_quadTransform;
+	ShaderProgram m_shader;
+	OBJMesh m_snakeMesh;
+	mat4 m_snakeTransform;
+
+	struct Light
+	{
+		vec3 direction;
+		vec3 colour;
+	};
+
+	Light m_light;
+	vec3 m_ambientLight;
+
 };

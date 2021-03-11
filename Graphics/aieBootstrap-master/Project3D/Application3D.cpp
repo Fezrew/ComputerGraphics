@@ -20,7 +20,7 @@ Application3D::~Application3D() {
 }
 
 bool Application3D::startup() {
-	
+
 	setBackgroundColour(0.25f, 0.25f, 0.25f);
 
 	// initialise gizmo primitive counts
@@ -32,23 +32,31 @@ bool Application3D::startup() {
 
 	m_shader.loadShader(eShaderStage::VERTEX, "./shaders/simple.vert");
 	m_shader.loadShader(eShaderStage::FRAGMENT, "./shaders/simple.frag");
+	m_shader.loadShader(eShaderStage::VERTEX, "./shaders/phong.vert");
+	m_shader.loadShader(eShaderStage::FRAGMENT, "./shaders/phong.frag");
 
-	if (m_shader.link() == false) 
+	if (m_shader.link() == false)
 	{
 		printf("Shader Error: %s\n", m_shader.getLastError());
 		return false;
 	}
 
-	m_quadMesh.initialiseQuad();
-
-	// make the quad 10 units wide
-	m_quadTransform = 
+	if (m_snakeMesh.load("./stanford/Snake/Snake.obj") == false)
 	{
-	10,0,0,0,
-	0,10,0,0,
-	0,0,10,0,
-	0,0,0,1 
+		printf("Snake Mesh Error!\n");
+		return false;
+	}
+
+	m_snakeTransform =
+	{
+		0.3f,0,0,0,
+		0,0.3f,0,0,
+		0,0,0.3f,0,
+		0,0,0,1
 	};
+
+	m_light.colour = { 1, 1, 0 };
+	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	return true;
 }
@@ -64,8 +72,10 @@ void Application3D::update(float deltaTime) {
 	float time = getTime();
 
 	// rotate camera
-	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 10, 10, glm::cos(time) * 10),
-	//						   vec3(0), vec3(0, 1, 0));
+	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 10, 10, glm::cos(time) * 10), vec3(0), vec3(0, 1, 0));
+
+	// rotate light
+	m_light.direction = normalize(vec3(cos(time * 2), sin(time * 2), 0));
 
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
@@ -99,12 +109,20 @@ void Application3D::draw() {
 	// bind shader
 	m_shader.bind();
 
+	// bind light
+	m_shader.bindUniform("AmbientColour", m_ambientLight);
+	m_shader.bindUniform("LightColour", m_light.colour);
+	m_shader.bindUniform("LightDirection", m_light.direction);
+
 	// bind transform
-	auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	auto pvm = m_projectionMatrix * m_viewMatrix * m_snakeTransform;
 	m_shader.bindUniform("ProjectionViewModel", pvm);
 
-	// draw quad
-	m_quadMesh.draw();
+	// bind transforms for lighting
+	m_shader.bindUniform("ModelMatrix", m_snakeTransform);
+
+	// draw mesh
+	m_snakeMesh.draw();
 
 	// draw 3D gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);

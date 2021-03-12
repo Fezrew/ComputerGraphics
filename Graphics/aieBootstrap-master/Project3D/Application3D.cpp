@@ -27,10 +27,6 @@ bool Application3D::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	// create simple camera transforms
-	m_viewMatrix = lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = perspective(pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
-
 	m_shader.loadShader(eShaderStage::VERTEX, "./shaders/simple.vert");
 	m_shader.loadShader(eShaderStage::FRAGMENT, "./shaders/simple.frag");
 	m_shader.loadShader(eShaderStage::VERTEX, "./shaders/phong.vert");
@@ -56,7 +52,7 @@ bool Application3D::startup() {
 		0,0,0,1
 	};
 
-	m_light.colour = { 1, 0, 0 };
+	m_light.colour = { 1, 1, 1 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	return true;
@@ -72,14 +68,15 @@ void Application3D::update(float deltaTime) {
 	// query time since application started
 	float time = getTime();
 
-	// rotate camera
+	// rotate camera & light
 	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 10, 10, glm::cos(time) * 10), vec3(0), vec3(0, 1, 0));
-
-	// rotate light
 	//m_light.direction = normalize(vec3(cos(time * 2), sin(time * 2), 0));
 
+	// move light to camera [BROKEN]
+	//m_light.direction = m_camera.getViewMatrix();
+
 	ImGui::Begin("Light Settings");
-	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f, 1.0f);
+	//ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f, 1.0f);
 	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.0f, 2.0f);
 	ImGui::End();
 
@@ -97,6 +94,9 @@ void Application3D::update(float deltaTime) {
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
 
+	//Update the camera's transform
+	m_camera.Update(deltaTime);
+
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
@@ -109,9 +109,6 @@ void Application3D::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	// update perspective in case window resized
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
-
 	// bind shader
 	m_shader.bind();
 
@@ -121,7 +118,10 @@ void Application3D::draw() {
 	m_shader.bindUniform("LightDirection", m_light.direction);
 
 	// bind transform
-	auto pvm = m_projectionMatrix * m_viewMatrix * m_snakeTransform;
+	mat4 projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
+	mat4 viewMatrix = m_camera.getViewMatrix();
+
+	auto pvm = projectionMatrix * viewMatrix * m_snakeTransform;
 	m_shader.bindUniform("ProjectionViewModel", pvm);
 
 	// bind transforms for lighting
@@ -131,7 +131,7 @@ void Application3D::draw() {
 	m_snakeMesh.draw();
 
 	// draw 3D gizmos
-	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+	//Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 
 	// draw 2D gizmos using an orthogonal projection matrix (or screen dimensions)
 	Gizmos::draw2D((float)getWindowWidth(), (float)getWindowHeight());

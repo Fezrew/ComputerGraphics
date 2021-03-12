@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "OBJMesh.h"
+#include "Camera.h"
 
 using namespace aie;
 
@@ -21,8 +22,8 @@ public:
 
 protected:
 
-	mat4	m_viewMatrix;
-	mat4	m_projectionMatrix;
+	//mat4	m_viewMatrix;
+	//mat4	m_projectionMatrix;
 
 	ShaderProgram m_shader;
 	OBJMesh m_snakeMesh;
@@ -36,5 +37,5 @@ protected:
 
 	Light m_light;
 	vec3 m_ambientLight;
-
+	Camera m_camera;
 };

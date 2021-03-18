@@ -8,6 +8,7 @@ mat4 Camera::getViewMatrix()
 	float thetaR = glm::radians(m_theta);
 	float phiR = glm::radians(m_phi);
 	vec3 forward(cos(phiR) * cos(thetaR), sin(phiR), cos(phiR) * sin(thetaR));
+	m_forward = forward;
 
 	return lookAt(m_position, m_position + forward, glm::vec3(0, 1, 0));
 }

@@ -191,6 +191,8 @@
     <None Include="..\bin\shaders\phong.vert" />
     <None Include="..\bin\shaders\simple.frag" />
     <None Include="..\bin\shaders\simple.vert" />
+    <None Include="..\bin\shaders\textured.frag" />
+    <None Include="..\bin\shaders\textured.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

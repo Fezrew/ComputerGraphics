@@ -22,12 +22,18 @@ public:
 
 protected:
 
-	//mat4	m_viewMatrix;
-	//mat4	m_projectionMatrix;
+	mat4 m_viewMatrix;
+	mat4 m_projectionMatrix;
+
+	Texture m_gridTexture;
 
 	ShaderProgram m_shader;
+	ShaderProgram m_texturedShader;
 	OBJMesh m_snakeMesh;
 	mat4 m_snakeTransform;
+
+	Mesh m_quadMesh;
+	mat4 m_quadTransform;
 
 	struct Light
 	{

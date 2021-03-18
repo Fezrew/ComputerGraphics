@@ -29,6 +29,10 @@ void Mesh::initialise(unsigned int vertexCount, const Vertex* vertices, unsigned
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
+	// enable third element as texture
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
+
 	// bind indices if there are any
 	if (indexCount != 0) 
 	{
@@ -99,14 +103,16 @@ void Mesh::initialiseQuad()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
+	// enable third element as texture
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
+
 	// unbind buffers
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// quad has 2 triangles
 	triCount = 2;
-
-	// MORE TO GO HERE
 }
 
 void Mesh::draw()

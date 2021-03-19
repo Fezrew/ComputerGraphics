@@ -29,8 +29,13 @@ protected:
 
 	ShaderProgram m_shader;
 	ShaderProgram m_texturedShader;
+	ShaderProgram m_normalMapShader;
+
 	OBJMesh m_snakeMesh;
 	mat4 m_snakeTransform;
+
+	OBJMesh m_spearMesh;
+	mat4 m_spearTransform;
 
 	Mesh m_quadMesh;
 	mat4 m_quadTransform;

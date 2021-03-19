@@ -39,6 +39,8 @@ bool Application3D::startup() {
 
 	m_texturedShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/textured.vert");
 	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/textured.frag");
+	m_texturedShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/normalmap.vert");
+	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/normalmap.frag");
 	if (m_texturedShader.link() == false) 
 	{
 		printf("Shader Error: %s\n", m_texturedShader.getLastError());
@@ -48,7 +50,6 @@ bool Application3D::startup() {
 		printf("Failed to load texture!\n");
 		return false;
 	}
-
 
 	if (m_snakeMesh.load("./stanford/Snake/Snake.obj", true, true) == false)
 	{
@@ -62,6 +63,20 @@ bool Application3D::startup() {
 		0,0.15f,0,0,
 		0,0,0.15f,0,
 		0,0,0,1
+	};
+
+	if (m_spearMesh.load("./stanford/soulspear/soulspear.obj", true, true) == false)
+	{
+		printf("Spear Mesh Error!\n");
+		return false;
+	}
+
+	m_spearTransform =
+	{
+		0.5,0,0,0,
+		0,0.5f,0,0,
+		0,0,0.5f,0,
+		1,0.5f,3,1
 	};
 
 	m_light.colour = { 1, 1, 1 };
@@ -83,13 +98,14 @@ bool Application3D::startup() {
 	return true;
 }
 
-void Application3D::shutdown() {
+void Application3D::shutdown() 
+{
 
 	Gizmos::destroy();
 }
 
-void Application3D::update(float deltaTime) {
-
+void Application3D::update(float deltaTime) 
+{
 	// query time since application started
 	float time = getTime();
 
@@ -98,12 +114,12 @@ void Application3D::update(float deltaTime) {
 	//m_light.direction = normalize(vec3(cos(time * 2), sin(time * 2), 0));
 
 	// move light to camera
-	m_light.direction = m_camera.getCamForward();
+	//m_light.direction = m_camera.getCamForward();
 
 	ImGui::Begin("Light Settings");
 
 	// Change the lights direction and colour manually
-	//ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f, 1.0f);
+	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f, 1.0f);
 	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.0f, 2.0f);
 	ImGui::End();
 
@@ -131,8 +147,8 @@ void Application3D::update(float deltaTime) {
 		quit();
 }
 
-void Application3D::draw() {
-
+void Application3D::draw() 
+{
 	// wipe the screen to the background colour
 	clearScreen();
 
@@ -141,24 +157,40 @@ void Application3D::draw() {
 	mat4 viewMatrix = m_camera.getViewMatrix();
 
 	// bind shader
-	m_shader.bind();
+	//m_shader.bind();
 
 	// bind shader
 	m_texturedShader.bind();
 
+	// bind light
+	m_texturedShader.bindUniform("AmbientColour", m_ambientLight);
+	m_texturedShader.bindUniform("LightColour", m_light.colour);
+	m_texturedShader.bindUniform("LightDirection", m_light.direction);
+	m_texturedShader.bindUniform("CameraPosition", viewMatrix);
+
 	// bind transform
 	auto pvm = projectionMatrix * viewMatrix * m_snakeTransform;
 	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	m_texturedShader.bindUniform("ModelMatrix", m_snakeTransform);
 
-	// draw meshes
+	// bind texture location
+	//m_texturedShader.bindUniform("diffuseTexture", 0);
+
+	// draw mesh
 	m_snakeMesh.draw();
+
+	// bind transform
+	pvm = projectionMatrix * viewMatrix * m_spearTransform;
+	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	m_texturedShader.bindUniform("ModelMatrix", m_spearTransform);
+
+	// draw mesh
+	m_spearMesh.draw();
 
 	// bind transform
 	pvm = projectionMatrix * viewMatrix * m_quadTransform;
 	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
-
-	// bind texture location
-	m_texturedShader.bindUniform("diffuseTexture", 0);
+	m_texturedShader.bindUniform("ModelMatrix", m_quadTransform);
 
 	// bind texture to specified location
 	m_gridTexture.bind(0);
@@ -167,7 +199,7 @@ void Application3D::draw() {
 	m_quadMesh.draw();
 
 	// draw 3D gizmos
-	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+	Gizmos::draw(projectionMatrix * viewMatrix);
 
 	// draw 2D gizmos using an orthogonal projection matrix (or screen dimensions)
 	Gizmos::draw2D((float)getWindowWidth(), (float)getWindowHeight());

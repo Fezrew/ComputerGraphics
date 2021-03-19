@@ -76,5 +76,11 @@
     <None Include="..\bin\shaders\textured.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\bin\shaders\normalmap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\normalmap.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

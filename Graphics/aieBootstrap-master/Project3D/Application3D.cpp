@@ -5,10 +5,7 @@
 #include <glm/ext.hpp>
 #include <imgui.h>
 
-using glm::vec3;
-using glm::vec4;
-using glm::mat4;
-using aie::Gizmos;
+
 using namespace aie;
 using namespace glm;
 

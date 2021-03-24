@@ -40,6 +40,7 @@ protected:
 	Mesh m_quadMesh;
 	mat4 m_quadTransform;
 
+	//TODO: Make this more accessable without creating include loops
 	struct Light
 	{
 		vec3 direction;

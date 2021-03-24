@@ -179,14 +179,8 @@ void Application3D::draw()
 	// draw mesh
 	m_snakeMesh.draw();
 
-	// bind transform
-	pvm = projectionMatrix * viewMatrix * m_spearTransform;
-	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
-	m_texturedShader.bindUniform("ModelMatrix", m_spearTransform);
 
-	// draw mesh
-	m_spearMesh.draw();
-
+	m_texturedShader.bind();
 	// bind transform
 	pvm = projectionMatrix * viewMatrix * m_quadTransform;
 	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
@@ -194,9 +188,20 @@ void Application3D::draw()
 
 	// bind texture to specified location
 	m_gridTexture.bind(0);
+	m_texturedShader.bindUniform("diffuseTexture", 0);
 
 	// draw quad
 	m_quadMesh.draw();
+
+
+	m_texturedShader.bind();
+	// bind transform
+	pvm = projectionMatrix * viewMatrix * m_spearTransform;
+	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	m_texturedShader.bindUniform("ModelMatrix", m_spearTransform);
+
+	// draw mesh
+	m_spearMesh.draw();
 
 	// draw 3D gizmos
 	Gizmos::draw(projectionMatrix * viewMatrix);

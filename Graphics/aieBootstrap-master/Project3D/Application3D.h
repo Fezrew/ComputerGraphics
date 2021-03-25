@@ -1,10 +1,9 @@
 #pragma once
 #include "Application.h"
-#include <glm/mat4x4.hpp>
 #include "Mesh.h"
 #include "Shader.h"
 #include "OBJMesh.h"
-#include "Camera.h"
+#include "Scene.h"
 
 using namespace aie;
 
@@ -32,22 +31,11 @@ protected:
 	ShaderProgram m_normalMapShader;
 
 	OBJMesh m_snakeMesh;
-	mat4 m_snakeTransform;
-
 	OBJMesh m_spearMesh;
-	mat4 m_spearTransform;
-
 	Mesh m_quadMesh;
 	mat4 m_quadTransform;
 
-	//TODO: Make this more accessable without creating include loops
-	struct Light
-	{
-		vec3 direction;
-		vec3 colour;
-	};
-
-	Light m_light;
-	vec3 m_ambientLight;
 	Camera m_camera;
+
+	Scene* m_scene;
 };

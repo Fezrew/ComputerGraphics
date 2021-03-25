@@ -10,6 +10,7 @@ public:
 	mat4 getViewMatrix();
 	mat4 getProjectionMatrix(float w, float h);
 	vec3 getCamForward() { return m_forward; }
+	vec3 getPosition() { return m_position; }
 
 	void Update(float deltaTime);
 

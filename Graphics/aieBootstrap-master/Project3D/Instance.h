@@ -1,18 +1,29 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include "Mesh.h"
-#include "Shader.h"
-#include "OBJMesh.h"
+#include "Camera.h"
+//#include "Scene.h"
 
-using namespace aie;
 using namespace glm;
 
-class Instance
+struct Light;
+class Scene;
+
+namespace aie
 {
-protected:
-	glm::mat4 m_transform;
-	aie::OBJMesh* m_mesh;
-	aie::ShaderProgram* m_shader;
-};
+	class ShaderProgram;
+	class OBJMesh;
+
+	class Instance
+	{
+	public:
+		Instance(OBJMesh* mesh, mat4 transform, ShaderProgram* shader);
+		void draw(Scene* scene);
+
+	protected:
+		mat4 m_transform;
+		OBJMesh* m_mesh;
+		ShaderProgram* m_shader = nullptr;
+	};
+}
 

@@ -28,8 +28,8 @@ class Shader {
 public:
 
 	Shader() : m_stage(0), m_handle(0), m_lastError(nullptr) {}
-	Shader(unsigned int stage, const char* filename)
-		: m_stage(0), m_handle(0), m_lastError(nullptr) {
+	Shader(unsigned int stage, const char* filename) : m_stage(0), m_handle(0), m_lastError(nullptr) 
+	{
 		loadShader(stage, filename);
 	}
 	~Shader();

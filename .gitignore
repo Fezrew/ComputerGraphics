@@ -19,7 +19,7 @@ x86/
 bld/
 [Oo]bj/
 
-!Graphics\aieBootstrap-master\dependencies\glfw\lib-vc2015\x64
+!Graphics/aieBootstrap-master/dependencies/glfw/lib-vc2015/x64/
 
 # Visual Studio 2015 cache/options directory
 .vs/

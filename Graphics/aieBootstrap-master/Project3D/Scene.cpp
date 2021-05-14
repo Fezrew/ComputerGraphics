@@ -4,7 +4,7 @@ Scene::Scene(Camera* camera, vec2 windowSize, Light& light, vec3 ambientLight)
 {
 	m_camera = camera;
 	m_windowSize = windowSize;
-	m_light = light;
+	m_sunLight = light;
 	m_ambientLight = ambientLight;
 }
 
@@ -22,6 +22,12 @@ void Scene::addInstance(Instance* instance)
 
 void Scene::draw()
 {
+	for (int i = 0; i < MAX_LIGHTS && i < m_pointLights.size(); i++)
+	{
+		m_pointLightPositions[i] = m_pointLights[i].direction;
+		m_pointLightColours[i] = m_pointLights[i].colour;
+	}
+
 	for (auto it = m_instances.begin(); it != m_instances.end(); it++)
 	{
 		Instance* instance = *it;

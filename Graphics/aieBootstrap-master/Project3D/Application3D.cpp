@@ -64,6 +64,11 @@ bool Application3D::startup() {
 
 	m_scene = new Scene(&m_camera, glm::vec2(getWindowWidth(), getWindowHeight()), light, glm::vec3(0.25f, 0.25f, 0.25f));
 
+	// red light on the left
+	m_scene->getPointLights().push_back(Light(vec3(5, 3, 0), vec3(1, 0, 0), 50));
+	// green light on the right
+	m_scene->getPointLights().push_back(Light(vec3(-5, 3, 0), vec3(0, 1, 0), 50));
+
 #pragma region Creating models
 	if (m_snakeMesh.load("./stanford/Snake/Snake.obj", true, true) == false)
 	{
@@ -128,8 +133,8 @@ void Application3D::update(float deltaTime)
 	ImGui::Begin("Light Settings");
 
 	// Change the lights direction and colour manually
-	ImGui::DragFloat3("Sunlight Direction", &m_scene->m_light.direction[0], 0.1f, -1.0f, 1.0f);
-	ImGui::DragFloat3("Sunlight Colour", &m_scene->m_light.colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::DragFloat3("Sunlight Direction", &m_scene->m_sunLight.direction[0], 0.1f, -1.0f, 1.0f);
+	ImGui::DragFloat3("Sunlight Colour", &m_scene->m_sunLight.colour[0], 0.1f, 0.0f, 2.0f);
 	ImGui::End();
 
 	// wipe the gizmos clean for this frame

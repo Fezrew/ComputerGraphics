@@ -25,9 +25,14 @@ void Instance::draw(Scene* scene)
 
 	m_shader->bindUniform("ModelMatrix", m_transform);
 	m_shader->bindUniform("AmbientColour", scene->getAmbientLight());
-	m_shader->bindUniform("LightColour", scene->m_light.colour);
-	m_shader->bindUniform("LightDirection", scene->m_light.direction);
+	m_shader->bindUniform("LightColour", scene->m_sunLight.colour);
+	m_shader->bindUniform("LightDirection", scene->m_sunLight.direction);
 	m_shader->bindUniform("cameraPosition", scene->getCamera()->getPosition());
+
+	int numLights = scene->getNumLights();
+	m_shader->bindUniform("numLights", numLights);
+	m_shader->bindUniform("PointLightPosition", numLights, scene -> getPointlightPositions());
+	m_shader->bindUniform("PointLightColour", numLights, scene -> getPointlightColours());
 
 	// draw mesh
 	m_mesh->draw();

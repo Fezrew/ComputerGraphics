@@ -19,8 +19,24 @@ uniform vec3 Ks; // specular material colour
 uniform float specularPower; // material specular power
 
 uniform vec3 AmbientColour; // ambient light colour
-uniform vec3 LightColour; // light colour
 uniform vec3 LightDirection;
+uniform vec3 LightColour;
+
+vec3 diffuse(vec3 direction, vec3 colour, vec3 normal)
+{
+	return colour * max( 0, dot( normal, -direction ) );
+}
+vec3 specular(vec3 direction, vec3 colour, vec3 normal, vec3 view)
+{
+	vec3 R = reflect( direction, normal );
+	float specularTerm = pow( max( 0, dot( R, view ) ), specularPower );
+	return specularTerm * colour;
+}
+
+const int MAX_LIGHTS = 4;
+uniform int numLights;
+uniform vec3 PointLightColour[MAX_LIGHTS];
+uniform vec3 PointLightPosition[MAX_LIGHTS];
 
 uniform vec3 CameraPosition;
 
@@ -40,22 +56,34 @@ void main()
 
 	N = TBN * (texNormal * 2 - 1);
 
-	// calculate lambert term (negate light direction)
-	float lambertTerm = max( 0, min( 1, dot( N, -L ) ) );
+	// calculate diffuse lighting from sunlight
+	vec3 diffuseTotal = diffuse(L, LightColour, N);
 	
 	// calculate view vector and reflection vector
 	vec3 V = normalize(CameraPosition - vPosition.xyz);
-	vec3 R = reflect( L, N );
 	
-	// calculate specular term
-	float specularTerm = pow( max( 0, dot( R, V ) ), specularPower );
+	// calculate specular light from directional light
+	vec3 specularTotal = specular(L, LightColour, N, V);
 	
+	for (int i=0; i<numLights; i++)
+	{
+		vec3 direction = vPosition.xyz - PointLightPosition[i];
+		float distance = length(direction);
+		direction = direction/distance;
+
+		// attenuate the light intensity with inverse square law
+		vec3 colour = PointLightColour[i]/(distance * distance);
+
+		diffuseTotal += diffuse(direction, colour, N);
+		specularTotal += specular(direction, colour, N, V);
+	}
+
 	// calculate each colour property
 	vec3 ambient = AmbientColour * Ka * texDiffuse;
-	vec3 diffuse = LightColour * Kd * texDiffuse * lambertTerm;
-	vec3 specular = LightColour * Ks * texSpecular * specularTerm;
+	vec3 diffuse = Kd * texDiffuse * diffuseTotal;
+	vec3 specular =  Ks * texSpecular * specularTotal;
+
 
 	// output final colour
 	FragColour = vec4( ambient + diffuse + specular, 1 );
-	//FragColour = vec4(N, 1);
 }
